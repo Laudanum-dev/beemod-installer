@@ -63,13 +63,32 @@ RequestExecutionLevel user
 Section "-hidden app"
     SectionIn RO
     SetOutPath "$INSTDIR"
+
+    ; Download the app to Temp folder
     inetc::get /BANNER "Downloading ${NAME} App..." /CAPTION "${NAME} App" "${URL_APP}" "$TEMP\app.zip"
+
+    ; Extract the app
     nsisunz::Unzip "$TEMP\app.zip" "$INSTDIR"
+
+    ; Delete the leftover in Temp folder
     Delete "$TEMP\app.zip"
-    CreateDirectory $INSTDIR\packages
+
+    ; Download the packages
     inetc::get /BANNER "Downloading ${NAME} Default packages... (this might take a few minutes)" /CAPTION "${NAME} Packages" "${URL_PACKS}" "$TEMP\packs.zip"
+
+    ; Create directory for packages
+    CreateDirectory $INSTDIR\packages
+
+    ; Extract the packages
     nsisunz::Unzip "$TEMP\packs.zip" "$INSTDIR\packages"
+
+    ; Delete the leftover in Temp folder
     Delete "$TEMP\packs.zip"
+
+    ; ONLY FOR 4.40.2: create config folder in %APPDATA%\BEEMOD2 (bc 4.40.2 forgot to do that)
+    CreateDirectory $APPDATA\BEEMOD2\config
+
+    ; Write uninstaller
     WriteUninstaller "$INSTDIR\Uninstall.exe"
 SectionEnd
 
